@@ -1,4 +1,4 @@
-const base = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
+const base = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 export async function request<T>(path: string, options: RequestInit = {}, token?: string): Promise<T> {
   const response = await fetch(`${base}${path}`, { ...options, headers: { 'Content-Type': 'application/json', ...(token ? { 'X-Session-Token': token } : {}), ...options.headers } });
   const body = await response.json().catch(() => null);
