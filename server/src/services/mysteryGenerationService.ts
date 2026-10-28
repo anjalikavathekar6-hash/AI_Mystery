@@ -26,7 +26,7 @@ export async function createMystery(input: { scenario: string; difficulty: strin
       ? `schemaPaths=${[...new Set(error.issues.map(issue => issue.path.join('.')))].join(',') || 'unknown'}`
       : `reason=${error instanceof Error ? error.message : 'unknown'}`;
     console.warn(`[case-generation] validationFailed ${reason}`);
-    throw new AppError(502, 'CASE_GENERATION_FAILED', 'Gemini returned a case with inconsistent details. Please try generating it again.');
+    throw new AppError(502, 'CASE_GENERATION_FAILED', `Gemini returned a case that failed validation (${reason}). Please try generating it again.`);
   }
   const publicCase = { summary: generated.summary, incidentDescription: generated.incidentDescription, location: generated.location, incidentTime: generated.incidentTime, suspects: generated.suspects, evidence: generated.evidence, timeline: generated.timeline, investigationInstructions: generated.investigationInstructions };
   const privateSolution = { culpritSuspectId: generated.culpritSuspectId, trueMotive: generated.trueMotive, actualSequenceOfEvents: generated.actualSequenceOfEvents, evidenceReasoning: generated.evidenceReasoning, redHerringExplanations: generated.redHerringExplanations, finalExplanation: generated.finalExplanation };

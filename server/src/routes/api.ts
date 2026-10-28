@@ -26,6 +26,9 @@ api.post('/cases', generateLimiter, wrap(async (req, res) => {
     res.status(201).json({ success: true, data });
   } catch (error) {
     console.warn(`[case-generation] requestFailedAfterMs=${Date.now() - startedAt}`);
+    if (error instanceof Error && /Retryable HTTP Error:/i.test(error.message)) {
+      throw new AppError(503, 'AI_PROVIDER_UNAVAILABLE', 'Gemini is temporarily unavailable. Please wait a moment and try generating the case again.');
+    }
     throw error;
   }
 }));
@@ -66,7 +69,7 @@ api.post('/cases/:caseId/sessions', wrap(async (req, res) => {
 
 const authenticate = wrap(async (req, _res, next) => {
   const token = req.header('x-session-token');
-  if (!validId(req.params.caseId as string)) throw new AppError(401, 'SESSION_UNAUTHORIZED', 'Your investigation session could not be verified.');
+  if (!token || !validId(String(req.params.sessionId))) throw new AppError(401, 'SESSION_UNAUTHORIZED', 'Your investigation session could not be verified.');
   const session = await InvestigationSession.findById(req.params.sessionId);
   if (!session || session.sessionTokenHash !== tokenHash(token ?? '')) throw new AppError(401, 'SESSION_UNAUTHORIZED', 'Your investigation session could not be verified.');
   (req as any).investigationSession = session;
@@ -102,9 +105,12 @@ if (!parsed.success) {
       message: 'Please check the submitted information.'
     }
   });
-}
+ }
+  session.notes = parsed.data.notes.map(note => note.content);
+  await session.save();
+  res.json({ success: true, data: { notes: session.notes } });
 
-}));
+ }));
 
 api.post('/sessions/:sessionId/accusation', accuseLimiter, authenticate, wrap(async (req, res) => {
   const session = (req as any).investigationSession;
@@ -123,9 +129,11 @@ if (!parsed.success) {
       message: 'Please check the submitted information.'
     }
   });
-}
+ }
+  const result = await revealAccusation(session, parsed.data.suspectId, parsed.data.reasoning);
+  res.json({ success: true, data: result });
 
-}));
+ }));
 
 api.get('/sessions/:sessionId', authenticate, wrap(async (req, res) => {
   const session = (req as any).investigationSession;
