@@ -10,7 +10,7 @@ An AI-generated, fictional detective investigation. React is built into static a
 - [x] Phase 4 — Persistent guest sessions, reviewed evidence, and notes.
 - [x] Phase 5 — Deterministic accusation evaluation and post-submission reveal.
 - [x] Phase 6 — Provider seam and explicit static/text-only image and CCTV fallbacks.
-- [x] Phase 7 — Run automated tests and verify the live MongoDB/Gemini flow in a configured environment.
+- [ ] Phase 7 — Run automated tests and verify the live MongoDB/Gemini flow in a configured environment.
 
 ## Requirements
 
