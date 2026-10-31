@@ -10,11 +10,11 @@ An AI-generated, fictional detective investigation. React is built into static a
 - [x] Phase 4 — Persistent guest sessions, reviewed evidence, and notes.
 - [x] Phase 5 — Deterministic accusation evaluation and post-submission reveal.
 - [x] Phase 6 — Provider seam and explicit static/text-only image and CCTV fallbacks.
-- [ ] Phase 7 — Run automated tests and verify the live MongoDB/Gemini flow in a configured environment.
+- [x] Phase 7 — Run automated tests and verify the live MongoDB/Gemini flow in a configured environment.
 
 ## Requirements
 
-- Node.js 24.22.1 and npm 10 or newer
+- Node.js 24.22.1 (pinned in `.node-version`) and npm 10 or newer
 - MongoDB 7+ (local or hosted)
 - A Google Gemini API key and a model available to that key
 
