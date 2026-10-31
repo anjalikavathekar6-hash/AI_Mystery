@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { env } from './config/env.js';
@@ -12,8 +13,8 @@ if (env.NODE_ENV === 'production') app.set('trust proxy', 1);
 app.use(cors({ origin: env.CLIENT_ORIGIN.split(',').map(x => x.trim()), methods: ['GET','POST','PUT','PATCH','OPTIONS'], allowedHeaders: ['Content-Type','X-Session-Token'] }));
 app.use(express.json({ limit: '64kb' }));
 app.use('/api/v1', api);
-if (env.NODE_ENV === 'production') {
-  const clientDist = resolve(dirname(fileURLToPath(import.meta.url)), '../../client/dist');
+const clientDist = resolve(dirname(fileURLToPath(import.meta.url)), '../../client/dist');
+if (existsSync(clientDist)) {
   app.use(express.static(clientDist, { index: false, maxAge: '1y', immutable: true }));
   app.get(/^\/(?!api(?:\/|$)).*/, (req, res, next) => {
     res.sendFile(resolve(clientDist, 'index.html'), error => {
